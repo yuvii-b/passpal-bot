@@ -15,4 +15,8 @@ public class BotConfig {
         return dotenv.get("TELEGRAM_BOT_TOKEN");
     }
 
+    public String getChatId(){
+        return dotenv.get("CHAT_ID");
+    }
+
 }
