@@ -88,4 +88,17 @@ public class BotService {
             throw new RuntimeException(e);
         }
     }
+
+    public String deletePassword(String name) {
+        if(name == null || name.isBlank()){
+            return "Invalid format, Usage: /delete <name>";
+        }
+        name = name.trim();
+        Optional<Password> checker = botRepo.findByNameIgnoreCase(name);
+        if(checker.isEmpty()){
+            return "No entry for: " + name;
+        }
+        botRepo.delete(checker.get());
+        return "Password deleted for: " + name;
+    }
 }
