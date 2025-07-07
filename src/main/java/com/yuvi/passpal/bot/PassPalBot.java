@@ -19,24 +19,35 @@ public class PassPalBot extends TelegramLongPollingBot {
 
     @Override
     public void onUpdateReceived(Update update) {
-        String msg = update.getMessage().getText();
-        String chatId = update.getMessage().getChatId().toString();
+        if(update.hasMessage() && update.getMessage().hasText()){
+            String msg = update.getMessage().getText();
+            String chatId = update.getMessage().getChatId().toString();
 
-        if(!chatId.equals(config.getChatId())){
+            if(!chatId.equals(config.getChatId())){
+                try{
+                    execute(new SendMessage(chatId, "You are not authorized to use this bot!"));
+                } catch (TelegramApiException e) {
+                    throw new RuntimeException(e);
+                }
+                return;
+            }
+
+            String[] parts = msg.split(" ", 2);
+            String response;
+
+            if(parts.length == 2 && parts[0].equalsIgnoreCase("/pass")){
+                response = "password";
+            } else{
+                response = "send like /pass <key>";
+            }
+
+            SendMessage message = new SendMessage(chatId, response);
+
             try{
-                execute(new SendMessage(chatId, "You are not authorized to use this bot!"));
+                execute(message);
             } catch (TelegramApiException e) {
                 throw new RuntimeException(e);
             }
-            return;
-        }
-
-        SendMessage message = new SendMessage(chatId, "Hello " + msg);
-
-        try{
-            execute(message);
-        } catch (TelegramApiException e) {
-            throw new RuntimeException(e);
         }
     }
 
