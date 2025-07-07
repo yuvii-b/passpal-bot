@@ -1,7 +1,6 @@
 package com.yuvi.passpal.bot;
 
 import com.yuvi.passpal.service.BotService;
-import com.yuvi.passpal.service.EncryptionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
@@ -14,13 +13,11 @@ public class PassPalBot extends TelegramLongPollingBot {
 
     private final BotConfig config;
     private final BotService botService;
-    private final EncryptionService encryptionService;
 
     @Autowired
-    public PassPalBot(BotConfig config, BotService botService, EncryptionService encryptionService){
+    public PassPalBot(BotConfig config, BotService botService){
         this.config = config;
         this.botService = botService;
-        this.encryptionService = encryptionService;
     }
 
     @Override
@@ -43,7 +40,7 @@ public class PassPalBot extends TelegramLongPollingBot {
 
             if(parts.length == 2 && parts[0].equalsIgnoreCase("/pass")){
                 try {
-                    response = encryptionService.decrypt(botService.getPassword(parts[1]));
+                    response = botService.getPassword(parts[1]);
                 } catch (Exception e) {
                     throw new RuntimeException(e);
                 }

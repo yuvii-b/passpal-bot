@@ -32,7 +32,7 @@ def main():
     with open(FILE_PATH, 'r') as f:
         for line in f:
             if line.strip():
-                name, password = line.strip().split(" ", 1)
+                name, password = line.strip().split(" - ", 1)
                 encrypted_pass = encrypt(password, ENCRYPTION_KEY)
                 cur.execute("INSERT INTO passwords (name, password) VALUES (%s, %s)", (name, encrypted_pass))
 
