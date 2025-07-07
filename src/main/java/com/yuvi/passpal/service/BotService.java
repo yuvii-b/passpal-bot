@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -66,5 +67,25 @@ public class BotService {
         }
         botRepo.save(pass);
         return "Password saved for: " + name;
+    }
+
+    public String updatePassword(String name, String password) {
+        if(name == null || password == null || name.isBlank() || password.isBlank()){
+            return "Invalid format, Usage: /update <name> <new password>";
+        }
+        name = name.trim();
+        password = password.trim();
+        Optional<Password> checker = botRepo.findByNameIgnoreCase(name);
+        if(checker.isEmpty()){
+            return "No existing password for: " + name;
+        }
+        try {
+            Password pass = checker.get();
+            pass.setPassword(encryptionService.encrypt(password));
+            botRepo.save(pass);
+            return "Password updated for: " + name;
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 }
