@@ -1,5 +1,7 @@
 package com.yuvi.passpal.bot;
 
+import com.yuvi.passpal.service.BotService;
+import com.yuvi.passpal.service.EncryptionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
@@ -11,10 +13,14 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 public class PassPalBot extends TelegramLongPollingBot {
 
     private final BotConfig config;
+    private final BotService botService;
+    private final EncryptionService encryptionService;
 
     @Autowired
-    public PassPalBot(BotConfig config){
+    public PassPalBot(BotConfig config, BotService botService, EncryptionService encryptionService){
         this.config = config;
+        this.botService = botService;
+        this.encryptionService = encryptionService;
     }
 
     @Override
@@ -36,9 +42,13 @@ public class PassPalBot extends TelegramLongPollingBot {
             String response;
 
             if(parts.length == 2 && parts[0].equalsIgnoreCase("/pass")){
-                response = "password";
+                try {
+                    response = encryptionService.decrypt(botService.getPassword(parts[1]));
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
             } else{
-                response = "send like /pass <key>";
+                response = "send like /pass <name for which you want the password>";
             }
 
             SendMessage message = new SendMessage(chatId, response);
