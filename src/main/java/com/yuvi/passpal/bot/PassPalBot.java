@@ -5,14 +5,21 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
+import org.telegram.telegrambots.meta.api.methods.updatingmessages.DeleteMessage;
+import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
+
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 @Component
 public class PassPalBot extends TelegramLongPollingBot {
 
     private final BotConfig config;
     private final BotService botService;
+    private final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
 
     @Autowired
     public PassPalBot(BotConfig config, BotService botService){
@@ -52,7 +59,8 @@ public class PassPalBot extends TelegramLongPollingBot {
             SendMessage message = new SendMessage(chatId, response);
 
             try{
-                execute(message);
+                Message sentMsg = execute(message);
+                scheduleDelete(chatId, sentMsg.getMessageId());
             } catch (TelegramApiException e) {
                 throw new RuntimeException(e);
             }
@@ -67,5 +75,15 @@ public class PassPalBot extends TelegramLongPollingBot {
     @Override
     public String getBotToken() {
         return config.getBotToken();
+    }
+
+    private void scheduleDelete(String chatId, int msgId){
+        scheduler.schedule(() -> {
+            try {
+                execute(new DeleteMessage(chatId, msgId));
+            } catch (TelegramApiException e) {
+                throw new RuntimeException(e);
+            }
+        }, 2, TimeUnit.MINUTES);
     }
 }
