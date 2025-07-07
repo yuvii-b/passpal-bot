@@ -25,10 +25,10 @@ public class PassPalBot extends TelegramLongPollingBot {
         if(!chatId.equals(config.getChatId())){
             try{
                 execute(new SendMessage(chatId, "You are not authorized to use this bot!"));
-                return;
             } catch (TelegramApiException e) {
                 throw new RuntimeException(e);
             }
+            return;
         }
 
         SendMessage message = new SendMessage(chatId, "Hello " + msg);
