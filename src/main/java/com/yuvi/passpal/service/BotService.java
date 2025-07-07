@@ -19,10 +19,24 @@ public class BotService {
         this.encryptionService = encryptionService;
     }
 
-    public String getPassword(String name) throws Exception{
+    public String getPassword(String name) {
         List<Password> results = botRepo.findByNameContaining(name);
         if(results.isEmpty()){
             return "No matches found for " + name;
+        }
+        return results.stream().map(p -> {
+            try {
+                return p.getName() + " : " + encryptionService.decrypt(p.getPassword());
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }).collect(Collectors.joining("\n"));
+    }
+
+    public String getAllPasswords(){
+        List<Password> results = botRepo.findAll();
+        if(results.isEmpty()){
+            return "No passwords found in database";
         }
         return results.stream().map(p -> {
             try {

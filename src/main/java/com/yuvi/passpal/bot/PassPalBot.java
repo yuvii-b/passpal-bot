@@ -35,17 +35,18 @@ public class PassPalBot extends TelegramLongPollingBot {
                 return;
             }
 
-            String[] parts = msg.split(" ", 2);
             String response;
-
-            if(parts.length == 2 && parts[0].equalsIgnoreCase("/pass")){
-                try {
+            if(msg.equalsIgnoreCase("/show")){
+                response = botService.getAllPasswords();
+            } else if(msg.startsWith("/pass")){
+                String[] parts = msg.split(" ", 2);
+                if(parts.length == 2){
                     response = botService.getPassword(parts[1]);
-                } catch (Exception e) {
-                    throw new RuntimeException(e);
+                } else{
+                    response = "Usage: /pass <name for which you want the password>";
                 }
             } else{
-                response = "send like /pass <name for which you want the password>";
+                response = "Unknown command. Try /pass <name> or /show";
             }
 
             SendMessage message = new SendMessage(chatId, response);
