@@ -46,4 +46,25 @@ public class BotService {
             }
         }).collect(Collectors.joining("\n"));
     }
+
+    public String addPassword(String name, String password){
+        if(name == null || password == null || name.isBlank() || password.isBlank()){
+            return "Invalid format, Usage: /add <name> <password>";
+        }
+        name = name.trim();
+        password = password.trim();
+        if(botRepo.findByNameIgnoreCase(name).isPresent()){
+            return "A password already exists for: " + name;
+        }
+
+        Password pass = new Password();
+        pass.setName(name);
+        try {
+            pass.setPassword(encryptionService.encrypt(password));
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        botRepo.save(pass);
+        return "Password saved for: " + name;
+    }
 }

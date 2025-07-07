@@ -52,6 +52,13 @@ public class PassPalBot extends TelegramLongPollingBot {
                 } else{
                     response = "Usage: /pass <name for which you want the password>";
                 }
+            } else if(msg.startsWith("/add")){
+                String[] parts = msg.split(" ", 3);
+                if(parts.length == 3){
+                    response = botService.addPassword(parts[1], parts[2]);
+                } else{
+                    response = "Usage: /add <name> <password>";
+                }
             } else{
                 response = "Unknown command. Try /pass <name> or /show";
             }
