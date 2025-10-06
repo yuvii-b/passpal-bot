@@ -1,22 +1,20 @@
 package com.yuvi.passpal.bot;
 
-import io.github.cdimascio.dotenv.Dotenv;
+import lombok.Getter;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class BotConfig {
-    private final Dotenv dotenv = Dotenv.load();
+    @Getter
+    @Value("${TELEGRAM_BOT_USERNAME}")
+    private String botUsername;
 
-    public String getBotUsername(){
-        return dotenv.get("TELEGRAM_BOT_USERNAME");
-    }
+    @Getter
+    @Value("${TELEGRAM_BOT_TOKEN}")
+    private String botToken;
 
-    public String getBotToken(){
-        return dotenv.get("TELEGRAM_BOT_TOKEN");
-    }
-
-    public String getChatId(){
-        return dotenv.get("CHAT_ID");
-    }
-
+    @Getter
+    @Value("${CHAT_ID}")
+    private String chatId;
 }
